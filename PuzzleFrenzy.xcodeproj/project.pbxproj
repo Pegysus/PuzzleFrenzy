@@ -16,6 +16,10 @@
 		123CD33926BB152800C1064D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 123CD33826BB152800C1064D /* Assets.xcassets */; };
 		123CD34426BB152800C1064D /* PuzzleFrenzyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123CD34326BB152800C1064D /* PuzzleFrenzyTests.swift */; };
 		123CD34F26BB152800C1064D /* PuzzleFrenzyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123CD34E26BB152800C1064D /* PuzzleFrenzyUITests.swift */; };
+		12E892F526C1CBC700C07E83 /* HomeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892F426C1CBC700C07E83 /* HomeScene.swift */; };
+		12E892F826C1CC0500C07E83 /* SelectMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892F726C1CC0500C07E83 /* SelectMenu.swift */; };
+		12E892FA26C1CC4000C07E83 /* WordSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892F926C1CC4000C07E83 /* WordSearch.swift */; };
+		12E892FC26C1CC5F00C07E83 /* Minesweeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892FB26C1CC5F00C07E83 /* Minesweeper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +55,10 @@
 		123CD34A26BB152800C1064D /* PuzzleFrenzyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PuzzleFrenzyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		123CD34E26BB152800C1064D /* PuzzleFrenzyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuzzleFrenzyUITests.swift; sourceTree = "<group>"; };
 		123CD35026BB152800C1064D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		12E892F426C1CBC700C07E83 /* HomeScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScene.swift; sourceTree = "<group>"; };
+		12E892F726C1CC0500C07E83 /* SelectMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectMenu.swift; sourceTree = "<group>"; };
+		12E892F926C1CC4000C07E83 /* WordSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSearch.swift; sourceTree = "<group>"; };
+		12E892FB26C1CC5F00C07E83 /* Minesweeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Minesweeper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,13 +109,13 @@
 		123CD32A26BB152700C1064D /* PuzzleFrenzy */ = {
 			isa = PBXGroup;
 			children = (
+				12E892F326C1BA0600C07E83 /* Controller */,
+				12E892F026C1B8CA00C07E83 /* Scenes */,
+				12E892F126C1B8D400C07E83 /* Resources */,
+				12E892F226C1B8E000C07E83 /* Utils */,
 				123CD32B26BB152700C1064D /* AppDelegate.swift */,
 				123CD32D26BB152700C1064D /* GameScene.sks */,
 				123CD32F26BB152700C1064D /* Actions.sks */,
-				123CD33126BB152700C1064D /* GameScene.swift */,
-				123CD33326BB152700C1064D /* GameViewController.swift */,
-				123CD33526BB152700C1064D /* Main.storyboard */,
-				123CD33826BB152800C1064D /* Assets.xcassets */,
 				123CD33A26BB152800C1064D /* Info.plist */,
 			);
 			path = PuzzleFrenzy;
@@ -129,6 +137,42 @@
 				123CD35026BB152800C1064D /* Info.plist */,
 			);
 			path = PuzzleFrenzyUITests;
+			sourceTree = "<group>";
+		};
+		12E892F026C1B8CA00C07E83 /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				123CD33126BB152700C1064D /* GameScene.swift */,
+				12E892F426C1CBC700C07E83 /* HomeScene.swift */,
+				12E892F726C1CC0500C07E83 /* SelectMenu.swift */,
+				12E892F926C1CC4000C07E83 /* WordSearch.swift */,
+				12E892FB26C1CC5F00C07E83 /* Minesweeper.swift */,
+			);
+			path = Scenes;
+			sourceTree = "<group>";
+		};
+		12E892F126C1B8D400C07E83 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				123CD33826BB152800C1064D /* Assets.xcassets */,
+				123CD33526BB152700C1064D /* Main.storyboard */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		12E892F226C1B8E000C07E83 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		12E892F326C1BA0600C07E83 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				123CD33326BB152700C1064D /* GameViewController.swift */,
+			);
+			path = Controller;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -262,9 +306,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				12E892F826C1CC0500C07E83 /* SelectMenu.swift in Sources */,
 				123CD33226BB152700C1064D /* GameScene.swift in Sources */,
 				123CD33426BB152700C1064D /* GameViewController.swift in Sources */,
 				123CD32C26BB152700C1064D /* AppDelegate.swift in Sources */,
+				12E892FA26C1CC4000C07E83 /* WordSearch.swift in Sources */,
+				12E892FC26C1CC5F00C07E83 /* Minesweeper.swift in Sources */,
+				12E892F526C1CBC700C07E83 /* HomeScene.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
