@@ -3,10 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		123169B026C3B05000BC5FC3 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 123169AF26C3B05000BC5FC3 /* FirebaseAuth */; };
+		123169B226C3B05000BC5FC3 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 123169B126C3B05000BC5FC3 /* FirebaseDatabase */; };
+		123169B426C3B05000BC5FC3 /* FirebaseDatabaseSwift-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = 123169B326C3B05000BC5FC3 /* FirebaseDatabaseSwift-Beta */; };
 		123CD32C26BB152700C1064D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123CD32B26BB152700C1064D /* AppDelegate.swift */; };
 		123CD32E26BB152700C1064D /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 123CD32D26BB152700C1064D /* GameScene.sks */; };
 		123CD33026BB152700C1064D /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 123CD32F26BB152700C1064D /* Actions.sks */; };
@@ -18,8 +21,9 @@
 		123CD34F26BB152800C1064D /* PuzzleFrenzyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123CD34E26BB152800C1064D /* PuzzleFrenzyUITests.swift */; };
 		12E892F526C1CBC700C07E83 /* HomeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892F426C1CBC700C07E83 /* HomeScene.swift */; };
 		12E892F826C1CC0500C07E83 /* SelectMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892F726C1CC0500C07E83 /* SelectMenu.swift */; };
-		12E892FA26C1CC4000C07E83 /* WordSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892F926C1CC4000C07E83 /* WordSearch.swift */; };
-		12E892FC26C1CC5F00C07E83 /* Minesweeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892FB26C1CC5F00C07E83 /* Minesweeper.swift */; };
+		12E892FA26C1CC4000C07E83 /* WordSearchScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892F926C1CC4000C07E83 /* WordSearchScene.swift */; };
+		12E892FC26C1CC5F00C07E83 /* MinesweeperScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892FB26C1CC5F00C07E83 /* MinesweeperScene.swift */; };
+		12E8930126C399E200C07E83 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 12E8930026C399E100C07E83 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,8 +61,9 @@
 		123CD35026BB152800C1064D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		12E892F426C1CBC700C07E83 /* HomeScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScene.swift; sourceTree = "<group>"; };
 		12E892F726C1CC0500C07E83 /* SelectMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectMenu.swift; sourceTree = "<group>"; };
-		12E892F926C1CC4000C07E83 /* WordSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSearch.swift; sourceTree = "<group>"; };
-		12E892FB26C1CC5F00C07E83 /* Minesweeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Minesweeper.swift; sourceTree = "<group>"; };
+		12E892F926C1CC4000C07E83 /* WordSearchScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSearchScene.swift; sourceTree = "<group>"; };
+		12E892FB26C1CC5F00C07E83 /* MinesweeperScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinesweeperScene.swift; sourceTree = "<group>"; };
+		12E8930026C399E100C07E83 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +71,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				123169B426C3B05000BC5FC3 /* FirebaseDatabaseSwift-Beta in Frameworks */,
+				123169B226C3B05000BC5FC3 /* FirebaseDatabase in Frameworks */,
+				123169B026C3B05000BC5FC3 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,6 +101,7 @@
 				123CD34226BB152800C1064D /* PuzzleFrenzyTests */,
 				123CD34D26BB152800C1064D /* PuzzleFrenzyUITests */,
 				123CD32926BB152700C1064D /* Products */,
+				12E8930026C399E100C07E83 /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -142,11 +151,11 @@
 		12E892F026C1B8CA00C07E83 /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
+				12E892FE26C3977000C07E83 /* WordSearch */,
+				12E892FD26C3976100C07E83 /* Minesweeper */,
 				123CD33126BB152700C1064D /* GameScene.swift */,
 				12E892F426C1CBC700C07E83 /* HomeScene.swift */,
 				12E892F726C1CC0500C07E83 /* SelectMenu.swift */,
-				12E892F926C1CC4000C07E83 /* WordSearch.swift */,
-				12E892FB26C1CC5F00C07E83 /* Minesweeper.swift */,
 			);
 			path = Scenes;
 			sourceTree = "<group>";
@@ -175,6 +184,22 @@
 			path = Controller;
 			sourceTree = "<group>";
 		};
+		12E892FD26C3976100C07E83 /* Minesweeper */ = {
+			isa = PBXGroup;
+			children = (
+				12E892FB26C1CC5F00C07E83 /* MinesweeperScene.swift */,
+			);
+			path = Minesweeper;
+			sourceTree = "<group>";
+		};
+		12E892FE26C3977000C07E83 /* WordSearch */ = {
+			isa = PBXGroup;
+			children = (
+				12E892F926C1CC4000C07E83 /* WordSearchScene.swift */,
+			);
+			path = WordSearch;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -191,6 +216,11 @@
 			dependencies = (
 			);
 			name = PuzzleFrenzy;
+			packageProductDependencies = (
+				123169AF26C3B05000BC5FC3 /* FirebaseAuth */,
+				123169B126C3B05000BC5FC3 /* FirebaseDatabase */,
+				123169B326C3B05000BC5FC3 /* FirebaseDatabaseSwift-Beta */,
+			);
 			productName = PuzzleFrenzy;
 			productReference = 123CD32826BB152700C1064D /* PuzzleFrenzy.app */;
 			productType = "com.apple.product-type.application";
@@ -262,6 +292,9 @@
 				Base,
 			);
 			mainGroup = 123CD31F26BB152700C1064D;
+			packageReferences = (
+				123169AE26C3B05000BC5FC3 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			productRefGroup = 123CD32926BB152700C1064D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -280,6 +313,7 @@
 			files = (
 				123CD33726BB152700C1064D /* Main.storyboard in Resources */,
 				123CD32E26BB152700C1064D /* GameScene.sks in Resources */,
+				12E8930126C399E200C07E83 /* GoogleService-Info.plist in Resources */,
 				123CD33926BB152800C1064D /* Assets.xcassets in Resources */,
 				123CD33026BB152700C1064D /* Actions.sks in Resources */,
 			);
@@ -310,8 +344,8 @@
 				123CD33226BB152700C1064D /* GameScene.swift in Sources */,
 				123CD33426BB152700C1064D /* GameViewController.swift in Sources */,
 				123CD32C26BB152700C1064D /* AppDelegate.swift in Sources */,
-				12E892FA26C1CC4000C07E83 /* WordSearch.swift in Sources */,
-				12E892FC26C1CC5F00C07E83 /* Minesweeper.swift in Sources */,
+				12E892FA26C1CC4000C07E83 /* WordSearchScene.swift in Sources */,
+				12E892FC26C1CC5F00C07E83 /* MinesweeperScene.swift in Sources */,
 				12E892F526C1CBC700C07E83 /* HomeScene.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -637,6 +671,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		123169AE26C3B05000BC5FC3 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		123169AF26C3B05000BC5FC3 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 123169AE26C3B05000BC5FC3 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		123169B126C3B05000BC5FC3 /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 123169AE26C3B05000BC5FC3 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		123169B326C3B05000BC5FC3 /* FirebaseDatabaseSwift-Beta */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 123169AE26C3B05000BC5FC3 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = "FirebaseDatabaseSwift-Beta";
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 123CD32026BB152700C1064D /* Project object */;
 }

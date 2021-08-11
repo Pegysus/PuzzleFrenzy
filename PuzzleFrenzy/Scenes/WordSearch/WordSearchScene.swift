@@ -1,5 +1,5 @@
 //
-//  Minesweeper.swift
+//  WordSearchScene.swift
 //  PuzzleFrenzy
 //
 //  Created by Max Yeh on 8/9/21.
@@ -8,6 +8,6 @@
 import SpriteKit
 import GameplayKit
 
-class Minesweeper: SKScene {
+class WordSearchScene: SKScene {
     
 }
