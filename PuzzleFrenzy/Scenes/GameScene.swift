@@ -7,13 +7,24 @@
 
 import SpriteKit
 import GameplayKit
+import Firebase
 
 class GameScene: SKScene {
     
     private var label : SKLabelNode?
     private var spinnyNode : SKShapeNode?
     
+    // Firebase Example
+    var ref: DatabaseReference!
+    var stamp: String!
+    
     override func didMove(to view: SKView) {
+        
+        // Example code for firebase (create/update values)
+        // Get should be similar but instead of placing values use .getData()
+        // More info: https://firebase.google.com/docs/database/ios/read-and-write
+        setupFirebase()
+        ref.setValue(stamp)
         
         // Get label node from scene and store it for use later
         self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
@@ -85,4 +96,25 @@ class GameScene: SKScene {
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
     }
+}
+
+extension GameScene {
+    
+    
+    func setupFirebase() { // setup firebase references + path
+        ref = Database.database().reference(withPath: "test")
+        stamp = createDate()
+    }
+    
+    func createDate() -> String { // used to create a specific string timestamp
+        let dateFormatter = DateFormatter()
+        let enUSPosixLocale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.locale = enUSPosixLocale
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
+        dateFormatter.calendar = Calendar(identifier: .gregorian)
+
+        let date = dateFormatter.string(from: Foundation.Date())
+        return date
+    }
+    
 }

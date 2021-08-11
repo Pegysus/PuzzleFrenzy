@@ -10,6 +10,7 @@
 		123169B026C3B05000BC5FC3 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 123169AF26C3B05000BC5FC3 /* FirebaseAuth */; };
 		123169B226C3B05000BC5FC3 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 123169B126C3B05000BC5FC3 /* FirebaseDatabase */; };
 		123169B426C3B05000BC5FC3 /* FirebaseDatabaseSwift-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = 123169B326C3B05000BC5FC3 /* FirebaseDatabaseSwift-Beta */; };
+		123169B626C4852000BC5FC3 /* MSTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123169B526C4852000BC5FC3 /* MSTile.swift */; };
 		123CD32C26BB152700C1064D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123CD32B26BB152700C1064D /* AppDelegate.swift */; };
 		123CD32E26BB152700C1064D /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 123CD32D26BB152700C1064D /* GameScene.sks */; };
 		123CD33026BB152700C1064D /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 123CD32F26BB152700C1064D /* Actions.sks */; };
@@ -44,6 +45,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		123169B526C4852000BC5FC3 /* MSTile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MSTile.swift; sourceTree = "<group>"; };
 		123CD32826BB152700C1064D /* PuzzleFrenzy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PuzzleFrenzy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		123CD32B26BB152700C1064D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		123CD32D26BB152700C1064D /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -188,6 +190,7 @@
 			isa = PBXGroup;
 			children = (
 				12E892FB26C1CC5F00C07E83 /* MinesweeperScene.swift */,
+				123169B526C4852000BC5FC3 /* MSTile.swift */,
 			);
 			path = Minesweeper;
 			sourceTree = "<group>";
@@ -342,6 +345,7 @@
 			files = (
 				12E892F826C1CC0500C07E83 /* SelectMenu.swift in Sources */,
 				123CD33226BB152700C1064D /* GameScene.swift in Sources */,
+				123169B626C4852000BC5FC3 /* MSTile.swift in Sources */,
 				123CD33426BB152700C1064D /* GameViewController.swift in Sources */,
 				123CD32C26BB152700C1064D /* AppDelegate.swift in Sources */,
 				12E892FA26C1CC4000C07E83 /* WordSearchScene.swift in Sources */,

@@ -11,3 +11,11 @@ import GameplayKit
 class MinesweeperScene: SKScene {
     
 }
+
+extension MinesweeperScene {
+    
+    func setupNodes() {
+        
+    }
+    
+}
