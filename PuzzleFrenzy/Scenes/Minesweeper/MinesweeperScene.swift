@@ -34,7 +34,11 @@ class MinesweeperScene: SKScene {
     // TODO: use SQLite3 to store current time left as the scene switches
     
     // Footer Nodes
-    var msDescription: SKLabelNode!
+    var msInstructions: SKLabelNode!
+    var msFlagsLeft: SKLabelNode!
+    var ms15SecondTimerStart: TimeInterval!
+    var ms15TimeLeft: Double!
+    
     
     /* Methods */
     
