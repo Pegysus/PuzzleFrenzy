@@ -20,6 +20,7 @@
 		123CD33926BB152800C1064D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 123CD33826BB152800C1064D /* Assets.xcassets */; };
 		123CD34426BB152800C1064D /* PuzzleFrenzyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123CD34326BB152800C1064D /* PuzzleFrenzyTests.swift */; };
 		123CD34F26BB152800C1064D /* PuzzleFrenzyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123CD34E26BB152800C1064D /* PuzzleFrenzyUITests.swift */; };
+		12E1ED1626CA231C00149FF2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12E1ED1526CA231C00149FF2 /* LaunchScreen.storyboard */; };
 		12E892F526C1CBC700C07E83 /* HomeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892F426C1CBC700C07E83 /* HomeScene.swift */; };
 		12E892F826C1CC0500C07E83 /* SelectMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892F726C1CC0500C07E83 /* SelectMenu.swift */; };
 		12E892FA26C1CC4000C07E83 /* WordSearchScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892F926C1CC4000C07E83 /* WordSearchScene.swift */; };
@@ -61,6 +62,7 @@
 		123CD34A26BB152800C1064D /* PuzzleFrenzyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PuzzleFrenzyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		123CD34E26BB152800C1064D /* PuzzleFrenzyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuzzleFrenzyUITests.swift; sourceTree = "<group>"; };
 		123CD35026BB152800C1064D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		12E1ED1526CA231C00149FF2 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		12E892F426C1CBC700C07E83 /* HomeScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScene.swift; sourceTree = "<group>"; };
 		12E892F726C1CC0500C07E83 /* SelectMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectMenu.swift; sourceTree = "<group>"; };
 		12E892F926C1CC4000C07E83 /* WordSearchScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSearchScene.swift; sourceTree = "<group>"; };
@@ -167,6 +169,7 @@
 			children = (
 				123CD33826BB152800C1064D /* Assets.xcassets */,
 				123CD33526BB152700C1064D /* Main.storyboard */,
+				12E1ED1526CA231C00149FF2 /* LaunchScreen.storyboard */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -317,6 +320,7 @@
 				123CD33726BB152700C1064D /* Main.storyboard in Resources */,
 				123CD32E26BB152700C1064D /* GameScene.sks in Resources */,
 				12E8930126C399E200C07E83 /* GoogleService-Info.plist in Resources */,
+				12E1ED1626CA231C00149FF2 /* LaunchScreen.storyboard in Resources */,
 				123CD33926BB152800C1064D /* Assets.xcassets in Resources */,
 				123CD33026BB152700C1064D /* Actions.sks in Resources */,
 			);
