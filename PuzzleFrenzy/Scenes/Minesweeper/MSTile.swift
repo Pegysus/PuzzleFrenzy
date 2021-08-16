@@ -26,7 +26,7 @@ class MSTile: SKSpriteNode {
         self.col = 0
         
         // gonna add image for the image of the unrevealed tile and use that
-        let texture = SKTexture(imageNamed: "msTile")
+        let texture = SKTexture(imageNamed: "MSTileImage")
         super.init(texture: texture, color: UIColor.white, size: texture.size())
         
     }
@@ -39,7 +39,7 @@ class MSTile: SKSpriteNode {
         self.row = row
         self.col = col
         
-        let texture = SKTexture(imageNamed: "msTile")
+        let texture = SKTexture(imageNamed: "MSTileImage")
         super.init(texture: texture, color: UIColor.white, size: texture.size())
     }
     

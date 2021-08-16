@@ -13,37 +13,19 @@ class GameViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        let skView = view as! SKView
         
-        if let view = self.view as! SKView? {
-            // Load the SKScene from 'GameScene.sks'
-            if let scene = SKScene(fileNamed: "GameScene") {
-                // Set the scale mode to scale to fit the window
-                scene.scaleMode = .aspectFill
-                
-                // Present the scene
-                view.presentScene(scene)
-            }
-            
-            view.ignoresSiblingOrder = true
-            
-            view.showsFPS = true
-            view.showsNodeCount = true
-        }
+        let scene = MinesweeperScene(size: view.bounds.size)
+        scene.scaleMode = .aspectFit
+        scene.size = view.bounds.size
+        print(view.bounds.size)
+        
+        skView.showsFPS = true
+        skView.showsNodeCount = true
+        skView.showsPhysics = true
+        skView.ignoresSiblingOrder = true
+        skView.presentScene(scene)
     }
 
-    override var shouldAutorotate: Bool {
-        return true
-    }
-
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            return .allButUpsideDown
-        } else {
-            return .all
-        }
-    }
-
-    override var prefersStatusBarHidden: Bool {
-        return true
-    }
 }
