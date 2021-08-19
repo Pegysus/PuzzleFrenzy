@@ -21,6 +21,7 @@
 		123CD34426BB152800C1064D /* PuzzleFrenzyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123CD34326BB152800C1064D /* PuzzleFrenzyTests.swift */; };
 		123CD34F26BB152800C1064D /* PuzzleFrenzyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123CD34E26BB152800C1064D /* PuzzleFrenzyUITests.swift */; };
 		12B905AE26C905D500929EF6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12B905AD26C905D500929EF6 /* LaunchScreen.storyboard */; };
+		12E1ED1826CC7C7C00149FF2 /* CollectionExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E1ED1726CC7C7C00149FF2 /* CollectionExt.swift */; };
 		12E892F526C1CBC700C07E83 /* HomeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892F426C1CBC700C07E83 /* HomeScene.swift */; };
 		12E892F826C1CC0500C07E83 /* SelectMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892F726C1CC0500C07E83 /* SelectMenu.swift */; };
 		12E892FA26C1CC4000C07E83 /* WordSearchScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892F926C1CC4000C07E83 /* WordSearchScene.swift */; };
@@ -63,6 +64,7 @@
 		123CD34E26BB152800C1064D /* PuzzleFrenzyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuzzleFrenzyUITests.swift; sourceTree = "<group>"; };
 		123CD35026BB152800C1064D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		12B905AD26C905D500929EF6 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		12E1ED1726CC7C7C00149FF2 /* CollectionExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionExt.swift; sourceTree = "<group>"; };
 		12E892F426C1CBC700C07E83 /* HomeScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScene.swift; sourceTree = "<group>"; };
 		12E892F726C1CC0500C07E83 /* SelectMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectMenu.swift; sourceTree = "<group>"; };
 		12E892F926C1CC4000C07E83 /* WordSearchScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSearchScene.swift; sourceTree = "<group>"; };
@@ -177,6 +179,7 @@
 		12E892F226C1B8E000C07E83 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				12E1ED1726CC7C7C00149FF2 /* CollectionExt.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -349,6 +352,7 @@
 			files = (
 				12E892F826C1CC0500C07E83 /* SelectMenu.swift in Sources */,
 				123CD33226BB152700C1064D /* GameScene.swift in Sources */,
+				12E1ED1826CC7C7C00149FF2 /* CollectionExt.swift in Sources */,
 				123169B626C4852000BC5FC3 /* MSTile.swift in Sources */,
 				123CD33426BB152700C1064D /* GameViewController.swift in Sources */,
 				123CD32C26BB152700C1064D /* AppDelegate.swift in Sources */,

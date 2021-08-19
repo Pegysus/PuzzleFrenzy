@@ -10,16 +10,21 @@ import GameplayKit
 
 class MinesweeperScene: SKScene {
     
+    /// The code is split into 3 groups, properties, methods, and configurations
+    /// Properties contain all the variables, both nodes and any game state variables
+    /// Methods will contain both gesture recognizers and state changes for those state variables
+    /// Configuration handles the visuals of the game, creating and altering the nodes given any updates
+    
     /* Properties */
 
     // Constants
-    let NUM_ROWS: Int = 13
+    let NUM_ROWS: Int = 10
     let NUM_COLS: Int = 15
-    let NUM_MINES: Int = 40
+    let NUM_MINES: Int = 30
     
     // Nodes
     var msBoard: SKSpriteNode!
-    var msGrid = [[MSTile]](repeating: [MSTile](repeating: MSTile(), count: 15), count: 13)
+    var msGrid = [[MSTile]](repeating: [MSTile](repeating: MSTile(), count: 15), count: 10) // 13 rows, 15 columns
     // TODO: use SQLite3 to store board state for scene switch
     
     // Camera Nodes
@@ -43,14 +48,100 @@ class MinesweeperScene: SKScene {
     var msFlagsLeft: SKSpriteNode!
     var msTilesLeft: SKSpriteNode!
     
+    // Temp Nodes
+    var touched: SKNode!
+    
+    // States
+    var firstPress = true // check if the user pressed the first time to reveal a tile and start the game
+    var isInPause = false // make sure to pause everything when the game is paused
+    var isInHelp = false // similar to pause, might delete if redundant
+    var gameOver = false // when timer runs out/mine is pressed
+    
     
     /* Methods */
+    
+    // basically the init function, when scene comes into play
     override func didMove(to view: SKView) {
         setupNodes()
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        guard let touch = touches.first else { return }
+        let node = atPoint(touch.location(in: self))
+        
+        touched = node
+    }
+    // TODO: going to have to change touchesBegan + touchesEnded and use UIGesture thingies
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        super.touchesEnded(touches, with: event)
+        guard let touch = touches.first else { return }
+        let node = atPoint(touch.location(in: self))
+        
+        if(touched.name == node.name) {
+            
+            if(touched.name!.contains("tile")) {
+                let i = touched.name!.index(touched.name!.startIndex, offsetBy: 4)
+                let j = touched.name!.index(touched.name!.startIndex, offsetBy: 5)
+                
+                let tileRow = Int(String(touched.name![i]))
+                let tileCol = Int(String(touched.name![j]))
+                
+                changeFlagState(row: tileRow!, col: tileCol!)
+            }
+            
+        }
+        
+    }
+    
+    // Used to check all the adjacent tiles for mines
+    func checkAdjTiles(row: Int, col: Int) -> Int {
+        var numAdj = 0
+        
+        // When i = 0, j = 0 we go on the current tile which technically isn't adjacent
+        // Fortunately, we check if the tile is a mine before running this loop,
+        // so checking this value doesn't change the value of adjacent mines at all
+        for i in -1...1 {
+            for j in -1...1 {
+                // we use [safe: index] here, refer to Utils/CollectionExt
+                if let curTile = msGrid[safe: row+i]![safe: col+j] {
+                    if curTile.isMine {
+                        numAdj += 1
+                    }
+                }
+            }
+        }
+        
+        return numAdj
+    }
+    
+    func createNumForAdjMines() {
+        
+        for i in 0..<NUM_ROWS {
+            for j in 0..<NUM_COLS {
+                if !msGrid[i][j].isMine { // check statement to prevent putting numbers on mines
+                    let numAdj = checkAdjTiles(row: i, col: j)
+                    msGrid[i][j].adjacentMines = numAdj
+                    createNum(row: i, col: j)
+                }
+            }
+        }
+        
+    }
+    
     /* State Changes */
     
+    // changes the state of the flag on a certain tile
+    func changeFlagState(row: Int, col: Int) {
+        if(msGrid[row][col].isFlagged) {
+            removeFlag(row: row, col: col)
+            msGrid[row][col].isFlagged = false
+        } else {
+            addFlag(row: row, col: col)
+            msGrid[row][col].isFlagged = true
+        }
+    }
     
 }
 
@@ -58,15 +149,33 @@ class MinesweeperScene: SKScene {
 
 extension MinesweeperScene {
     
+    /* Scene changes */
+    func removeFlag(row: Int, col: Int) {
+        
+    }
+    func addFlag(row: Int, col: Int) {
+        
+    }
+    func addMine(row: Int, col: Int) {
+        
+    }
+    func createNum(row: Int, col: Int) {
+        
+    }
+    
+    /* Scene setup */
+    
+    // creates all the nodes and stuff
     func setupNodes() {
+        setupCamera()
         setupBackground()
         setupGrid()
-        setupCamera()
         setupHeader()
         setupTimer()
         setupFooter()
     }
     
+    /// white background + the header and footer when the camera moves
     func setupBackground() {
         let background = SKSpriteNode()
         background.name = "background"
@@ -76,8 +185,25 @@ extension MinesweeperScene {
         background.zPosition = -20.0
         background.color = UIColor.white
         addChild(background)
+        
+        let headerBackground = SKSpriteNode()
+        headerBackground.name = "header background"
+        headerBackground.size = CGSize(width: self.frame.width, height: (1.0 / 4.0)*self.frame.height)
+        headerBackground.position = CGPoint(x: 0.0, y: -(3.0/8.0)*self.frame.height)
+        headerBackground.zPosition = -15.0
+        headerBackground.color = UIColor.white
+        camera?.addChild(headerBackground)
+        
+        let footerBackground = SKSpriteNode()
+        footerBackground.name = "footer background"
+        footerBackground.size = CGSize(width: self.frame.width, height: (1.0 / 4.0)*self.frame.height)
+        footerBackground.position = CGPoint(x: 0.0, y: (3.0/8.0)*self.frame.height)
+        footerBackground.zPosition = -15.0
+        footerBackground.color = UIColor.white
+        camera?.addChild(footerBackground)
     }
     
+    /// this is both the board and all of the tiles (not revealed at the beginning)
     func setupGrid() {
         
         // TODO: setup board dimensions, color, etc.
@@ -91,21 +217,35 @@ extension MinesweeperScene {
         for i in 0..<NUM_ROWS {
             for j in 0..<NUM_COLS {
                 msGrid[i][j] = MSTile(row: i, col: j)
+                msGrid[i][j].name = "tile" + "\(i)" + "\(j)"
+                msGrid[i][j].anchorPoint = CGPoint(x: 0.0, y: 1.0)
+                msGrid[i][j].size = CGSize(width: (1.0 / 15.0)*msBoard.size.width, height: (1.0 / 15.0)*msBoard.size.width)
+                
+                let initialXPos = (1.0/8.0) * self.frame.width + (1/90.0) * self.frame.width
+                let xIncrement = (1.0/10.0) * msBoard.size.width * CGFloat(i)
+                let initialYPos = (3.0/4.0) * self.frame.height - (1/175.0) * self.frame.height
+                let yIncrement = (1.0/15.0) * msBoard.size.height * CGFloat(j)
+                msGrid[i][j].position = CGPoint(x: initialXPos + xIncrement, y: initialYPos - yIncrement)
+                
+                msGrid[i][j].zPosition = 10.0
+                addChild(msGrid[i][j])
             }
         }
+        // TODO: naming convention of the tiles
         
         // TODO: set position of tiles given board dimensions
         
         
     }
     
-    // Camera setup, set original position to center of the board
+    /// Camera setup, set original position to center of the board
     func setupCamera() {
         addChild(msCameraNode)
         camera = msCameraNode
         msCameraNode.position = CGPoint(x: self.frame.width/2.0, y: self.frame.height/2.0)
     }
     
+    /// Help, Pause, and 15 second timer all over here
     func setupHeader() {
         msHelpButton = SKSpriteNode(imageNamed: "GHelpButton")
         msHelpButton.name = "help button"
@@ -138,6 +278,7 @@ extension MinesweeperScene {
         camera?.addChild(msBigTimer)
     }
     
+    /// Flags and Tiles left on the board
     func setupFooter() {
         // TODO: create text for description to fill in negative space
         msFlagsLeft = SKSpriteNode(imageNamed: "MSFooterFlagsLeft")
