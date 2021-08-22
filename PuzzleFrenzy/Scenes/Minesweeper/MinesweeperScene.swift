@@ -21,10 +21,12 @@ class MinesweeperScene: SKScene {
     let NUM_ROWS: Int = 10
     let NUM_COLS: Int = 15
     let NUM_MINES: Int = 30
+    let MS_FLAG_TEXTURE = SKTexture(imageNamed: "MSFlagImage")
     
     // Nodes
     var msBoard: SKSpriteNode!
     var msGrid = [[MSTile]](repeating: [MSTile](repeating: MSTile(), count: 15), count: 10) // 13 rows, 15 columns
+    var msFlags = [[SKSpriteNode]](repeating: [SKSpriteNode](repeating: SKSpriteNode(), count: 15), count: 10)
     // TODO: use SQLite3 to store board state for scene switch
     
     // Camera Nodes
@@ -63,36 +65,53 @@ class MinesweeperScene: SKScene {
     // basically the init function, when scene comes into play
     override func didMove(to view: SKView) {
         setupNodes()
+        
+        let singleTapGesture = UITapGestureRecognizer(target: self, action: #selector(singleTap(_:)))
+        singleTapGesture.numberOfTapsRequired = 1
+        view.addGestureRecognizer(singleTapGesture)
+        
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPress(_:)))
+        view.addGestureRecognizer(longPressGesture)
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-        guard let touch = touches.first else { return }
-        let node = atPoint(touch.location(in: self))
-        
-        touched = node
-    }
-    // TODO: going to have to change touchesBegan + touchesEnded and use UIGesture thingies
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
-        super.touchesEnded(touches, with: event)
-        guard let touch = touches.first else { return }
-        let node = atPoint(touch.location(in: self))
-        
-        if(touched.name == node.name) {
+    @objc func singleTap(_ sender: UITapGestureRecognizer) {
+        let node = atPoint(sender.location(in: self.view))
             
-            if(touched.name!.contains("tile")) {
-                let i = touched.name!.index(touched.name!.startIndex, offsetBy: 4)
-                let j = touched.name!.index(touched.name!.startIndex, offsetBy: 5)
-                
-                let tileRow = Int(String(touched.name![i]))
-                let tileCol = Int(String(touched.name![j]))
-                
-                changeFlagState(row: tileRow!, col: tileCol!)
+        if(node.name!.contains("tile")) {
+            let i = node.name!.index(node.name!.startIndex, offsetBy: 4)
+            let j = node.name!.index(node.name!.startIndex, offsetBy: 5)
+            
+            let tileRow = Int(String(node.name![i]))
+            var tileCol = Int(String(node.name![j]))
+            if node.name!.count > 6 {
+                tileCol = Int(String(node.name!.suffix(2)))
             }
             
+//            print("(\(tileRow), \(tileCol))")
+            
+            if(!msGrid[tileRow!][tileCol!].isRevealed) {
+                changeFlagState(row: tileRow!, col: tileCol!)
+            }
         }
+    }
+    
+    @objc func longPress(_ sender: UITapGestureRecognizer) {
+        let node = atPoint(sender.location(in: self.view))
         
+        if(node.name!.contains("tile")) {
+            let i = node.name!.index(node.name!.startIndex, offsetBy: 4)
+            let j = node.name!.index(node.name!.startIndex, offsetBy: 5)
+            
+            let tileRow = Int(String(node.name![i]))
+            var tileCol = Int(String(node.name![j]))
+            if node.name!.count > 6 {
+                tileCol = Int(String(node.name!.suffix(2)))
+            }
+            
+            if(!msGrid[tileRow!][tileCol!].isRevealed && !msGrid[tileRow!][tileCol!].isFlagged) {
+                revealTile(row: tileRow!, col: tileCol!)
+            }
+        }
     }
     
     // Used to check all the adjacent tiles for mines
@@ -151,16 +170,23 @@ extension MinesweeperScene {
     
     /* Scene changes */
     func removeFlag(row: Int, col: Int) {
-        
+        let removeAction = SKAction.fadeAlpha(to: 0.0, duration: 0.0)
+        msFlags[row][14-col].run(removeAction)
     }
     func addFlag(row: Int, col: Int) {
-        
+        let addAction = SKAction.fadeAlpha(to: 1.0, duration: 0.0)
+        msFlags[row][14-col].run(addAction)
     }
     func addMine(row: Int, col: Int) {
         
     }
     func createNum(row: Int, col: Int) {
         
+    }
+    func revealTile(row: Int, col: Int) {
+        msGrid[row][col].isRevealed = true
+        let removeAction = SKAction.fadeAlpha(to: 0.0, duration: 0.0)
+        msGrid[row][14-col].run(removeAction)
     }
     
     /* Scene setup */
@@ -203,10 +229,9 @@ extension MinesweeperScene {
         camera?.addChild(footerBackground)
     }
     
-    /// this is both the board and all of the tiles (not revealed at the beginning)
+    /// this is both the board and all of the tiles and flags (not revealed at the beginning)
     func setupGrid() {
         
-        // TODO: setup board dimensions, color, etc.
         msBoard = SKSpriteNode(imageNamed: "MSBoard")
         msBoard.name = "board"
         msBoard.size = CGSize(width: (3.0 / 4.0)*self.frame.width, height: (1.0 / 2.0)*self.frame.height)
@@ -218,6 +243,9 @@ extension MinesweeperScene {
             for j in 0..<NUM_COLS {
                 msGrid[i][j] = MSTile(row: i, col: j)
                 msGrid[i][j].name = "tile" + "\(i)" + "\(j)"
+                
+//                print("\(msGrid[i][j].name), \(i), \(j)")
+                
                 msGrid[i][j].anchorPoint = CGPoint(x: 0.0, y: 1.0)
                 msGrid[i][j].size = CGSize(width: (1.0 / 15.0)*msBoard.size.width, height: (1.0 / 15.0)*msBoard.size.width)
                 
@@ -229,12 +257,19 @@ extension MinesweeperScene {
                 
                 msGrid[i][j].zPosition = 10.0
                 addChild(msGrid[i][j])
+                
+                msFlags[i][j] = SKSpriteNode(texture: MS_FLAG_TEXTURE)
+                msFlags[i][j].name = "flag" + "\(i)" + "\(j)"
+                msFlags[i][j].anchorPoint = CGPoint(x: 0.0, y: 1.0)
+                msFlags[i][j].size = CGSize(width: msGrid[i][j].size.width * 0.8,
+                                            height: msGrid[i][j].size.height * 0.8)
+                msFlags[i][j].position = CGPoint(x: msGrid[i][j].position.x + msGrid[i][j].size.width * 0.05,
+                                                 y: msGrid[i][j].position.y - msGrid[i][j].size.height * 0.05)
+                msFlags[i][j].zPosition = 15.0
+                msFlags[i][j].alpha = 0.0
+                addChild(msFlags[i][j])
             }
         }
-        // TODO: naming convention of the tiles
-        
-        // TODO: set position of tiles given board dimensions
-        
         
     }
     
