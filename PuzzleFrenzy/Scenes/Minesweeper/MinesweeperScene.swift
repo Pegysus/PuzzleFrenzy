@@ -21,11 +21,13 @@ class MinesweeperScene: SKScene {
     let NUM_ROWS: Int = 10
     let NUM_COLS: Int = 15
     let NUM_MINES: Int = 30
-    let MS_FLAG_TEXTURE = SKTexture(imageNamed: "MSFlagImage")
+    let DIRECTIONS: [(Int, Int)] = [(0, 1), (1, 0), (0, -1), (-1, 0)] // directions to reveal mines
+    let MS_FLAG_TEXTURE = SKTexture(imageNamed: "MSFlagImage") // create texture to duplicate flags
     
     // Nodes
-    var msBoard: SKSpriteNode!
+    var msBoard: SKSpriteNode! // background board
     var msGrid = [[MSTile]](repeating: [MSTile](repeating: MSTile(), count: 15), count: 10) // 13 rows, 15 columns
+    // 2d grid of empty spritenodes, will be revealed once clicked
     var msFlags = [[SKSpriteNode]](repeating: [SKSpriteNode](repeating: SKSpriteNode(), count: 15), count: 10)
     // TODO: use SQLite3 to store board state for scene switch
     
@@ -64,38 +66,52 @@ class MinesweeperScene: SKScene {
     
     // basically the init function, when scene comes into play
     override func didMove(to view: SKView) {
+        // go to extension to see configuration
         setupNodes()
         
+        // single tap gesture, flag/unflag the specific tile
         let singleTapGesture = UITapGestureRecognizer(target: self, action: #selector(singleTap(_:)))
         singleTapGesture.numberOfTapsRequired = 1
         view.addGestureRecognizer(singleTapGesture)
         
+        // long press gesture, reveal the tile and any nearby ones (if no mine nearby)
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPress(_:)))
         view.addGestureRecognizer(longPressGesture)
     }
     
+    // flag and unflag the tile
     @objc func singleTap(_ sender: UITapGestureRecognizer) {
         let touch = sender.location(in: view)
+        // convert the touch location relative to the view frame
         let touchPointInScene = view?.scene?.convertPoint(toView: touch)
         
+        // find the node being pressed (specifically looking for the tile)
         let node = view?.scene?.atPoint(touchPointInScene!)
         
-        print("single tap, node name: \(node!.name!)")
+//        debugging
+//        print("single tap, node name: \(node!.name!)")
             
+        // if either tile or flag (on top of tile), then find location of node given the name
         if(node!.name!.contains("tile") || node!.name!.contains("flag")) {
+            // find the row and col from the node's name
             let i = node!.name!.index(node!.name!.startIndex, offsetBy: 4)
             let j = node!.name!.index(node!.name!.startIndex, offsetBy: 5)
             
+            // convert substring to integer
             let tileRow = Int(String(node!.name![i]))!
             var tileCol = Int(String(node!.name![j]))!
+            // 2 digit numbers
             if node!.name!.count > 6 {
                 tileCol = Int(String(node!.name!.suffix(2)))!
             }
             
+//            debugging
 //            print("(\(tileRow), \(tileCol))")
             
+            // can only change flag state of tiles that aren't revealed yet
             if(!msGrid[tileRow][tileCol].isRevealed) {
-                print("Changed flag: (\(tileRow), \(tileCol)), position: \(msGrid[tileRow][tileCol].position)")
+//                debugging
+//                print("Changed flag: (\(tileRow), \(tileCol)), position: \(msGrid[tileRow][tileCol].position)")
                 
                 changeFlagState(row: tileRow, col: tileCol)
             }
@@ -104,25 +120,35 @@ class MinesweeperScene: SKScene {
     
     @objc func longPress(_ sender: UITapGestureRecognizer) {
         let touch = sender.location(in: view)
+        // convert touch location in view
         let touchPointInScene = view?.scene?.convertPoint(toView: touch)
         
+        // find the node at the touch location
         let node = view?.scene?.atPoint(touchPointInScene!)
         
-        print("long press, node name: \(node!.name!)")
+//        debugging
+//        print("long press, node name: \(node!.name!)")
         
+        // if the node is the tile, no need to check flag b/c flagged tiles will not be revealed
         if(node!.name!.contains("tile")) {
+            // find the location given the name
             let i = node!.name!.index(node!.name!.startIndex, offsetBy: 4)
             let j = node!.name!.index(node!.name!.startIndex, offsetBy: 5)
             
+            // convert substring to int
             let tileRow = Int(String(node!.name![i]))!
             var tileCol = Int(String(node!.name![j]))!
+            // convert if 2 digit number exists
             if node!.name!.count > 6 {
                 tileCol = Int(String(node!.name!.suffix(2)))!
             }
             
+            // checkes both revealed and flagged to make sure you don't revealed wrong tile
             if(!msGrid[tileRow][tileCol].isRevealed && !msGrid[tileRow][tileCol].isFlagged) {
-                print("Revealed tile: (\(tileRow), \(tileCol)), position: \(msGrid[tileRow][tileCol].position)")
+//                debugging
+//                print("Revealed tile: (\(tileRow), \(tileCol)), position: \(msGrid[tileRow][tileCol].position)")
                 
+                // first press much create mines afterwards (so you don't accidently click on mine first)
                 if(firstPress) {
                     firstPressed(row: tileRow, col: tileCol)
                 } else {
@@ -132,14 +158,32 @@ class MinesweeperScene: SKScene {
         }
     }
     
+    // randomize mines and create numbers
     func firstPressed(row: Int, col: Int) {
-        revealTile(row: row, col: col)
         randomizeMines(row: row, col: col)
+        createNumForAdjMines()
         changedfirstPressedState()
+        revealTileAndNearby(row: row, col: col)
     }
     
     func randomizeMines(row: Int, col: Int) {
-        
+        // all the mines
+        for _ in 0..<NUM_MINES {
+            // keep changing random position until all conditiosn satisfied
+            var isPlaced = false
+            
+            while !isPlaced {
+                let ranRow = Int.random(in: 0..<NUM_ROWS)
+                let ranCol = Int.random(in: 0..<NUM_COLS)
+                
+                // not starting click and not already a mine
+                if !msGrid[ranRow][ranCol].isMine && (ranRow != row && ranCol != col) {
+                    changeMineState(row: ranRow, col: ranCol)
+                    addMine(row: ranRow, col: ranCol)
+                    isPlaced = true
+                }
+            }
+        }
     }
     
     // Used to check all the adjacent tiles for mines
@@ -164,7 +208,6 @@ class MinesweeperScene: SKScene {
     }
     
     func createNumForAdjMines() {
-        
         for i in 0..<NUM_ROWS {
             for j in 0..<NUM_COLS {
                 if !msGrid[i][j].isMine { // check statement to prevent putting numbers on mines
@@ -174,18 +217,18 @@ class MinesweeperScene: SKScene {
                 }
             }
         }
-        
     }
     
     func revealTileAndNearby(row: Int, col: Int) {
+        // reveal current tile
         revealTile(row: row, col: col)
+        // only reveal if current tile has no number
+        // TODO: might need to change the loop to ensure that corners get revealed as well
         if msGrid[row][col].adjacentMines == 0 {
-            for i in -1...1 {
-                for j in -1...1 {
-                    if let curTile = msGrid[safe: row+i]?[safe: col+j] {
-                        if !curTile.isRevealed {
-                            revealTileAndNearby(row: row+i, col: col+j)
-                        }
+            for i in 0..<4 {
+                if let curTile = msGrid[safe: row+DIRECTIONS[i].0]?[safe: col+DIRECTIONS[i].1] {
+                    if !curTile.isRevealed {
+                        revealTileAndNearby(row: row+DIRECTIONS[i].0, col: col+DIRECTIONS[i].1)
                     }
                 }
             }
@@ -205,8 +248,14 @@ class MinesweeperScene: SKScene {
         }
     }
     
+    // should only be caleld once
     func changedfirstPressedState() {
         firstPress = false
+    }
+    
+    // just to change mine state
+    func changeMineState(row: Int, col: Int) {
+        msGrid[row][col].isMine = true
     }
     
 }
@@ -230,15 +279,12 @@ extension MinesweeperScene {
     func createNum(row: Int, col: Int) {
         
     }
+    // reveal current tile by changing opacity to 0
     func revealTile(row: Int, col: Int) {
         msGrid[row][col].isRevealed = true
         let removeAction = SKAction.fadeAlpha(to: 0.0, duration: 0.0)
-        print("reiterate coord of grid: (\(row), \(col))")
-        print("reiterate coord of grid2: \(msGrid[row][col].name)")
-        print("test other node: \(msGrid[row][14-col].position)")
-        print("test other node: \(msGrid[row][14-col].name)")
-        print("test other node: \(msGrid[row][14-col].isRevealed)")
-        print("position of tile: \(msGrid[row][col].position)")
+//        debugging
+//        print("reiterate coord of grid: (\(row), \(col))")
         msGrid[row][col].run(removeAction)
     }
     
@@ -256,6 +302,7 @@ extension MinesweeperScene {
     
     /// white background + the header and footer when the camera moves
     func setupBackground() {
+        // background, full frame color white
         let background = SKSpriteNode()
         background.name = "background"
         background.size = CGSize(width: self.frame.width, height: self.frame.height)
@@ -265,6 +312,7 @@ extension MinesweeperScene {
         background.color = UIColor.white
         addChild(background)
         
+        // use a headerBackground for the camera so that it won't be affected by the zoom
         let headerBackground = SKSpriteNode()
         headerBackground.name = "header background"
         headerBackground.size = CGSize(width: self.frame.width, height: (1.0 / 4.0)*self.frame.height)
@@ -273,6 +321,7 @@ extension MinesweeperScene {
         headerBackground.color = UIColor.white
         camera?.addChild(headerBackground)
         
+        // use a footerBackground for the camera so that it won't be affected by the zoom
         let footerBackground = SKSpriteNode()
         footerBackground.name = "footer background"
         footerBackground.size = CGSize(width: self.frame.width, height: (1.0 / 4.0)*self.frame.height)
@@ -284,7 +333,7 @@ extension MinesweeperScene {
     
     /// this is both the board and all of the tiles and flags (not revealed at the beginning)
     func setupGrid() {
-        
+        // create board, beige, 1/2 of the frame
         msBoard = SKSpriteNode(imageNamed: "MSBoard")
         msBoard.name = "board"
         msBoard.size = CGSize(width: (3.0 / 4.0)*self.frame.width, height: (1.0 / 2.0)*self.frame.height)
@@ -292,6 +341,7 @@ extension MinesweeperScene {
         msBoard.zPosition = -10.0
         addChild(msBoard)
         
+        // create each tile and flag
         for i in 0..<NUM_ROWS {
             for j in 0..<NUM_COLS {
                 msGrid[i][j] = MSTile(row: i, col: j)
@@ -300,6 +350,7 @@ extension MinesweeperScene {
                 msGrid[i][j].anchorPoint = .zero
                 msGrid[i][j].size = CGSize(width: (1.0 / 15.0)*msBoard.size.width, height: (1.0 / 15.0)*msBoard.size.width)
                 
+                // weird position calculations, but works ig
                 let initialXPos = (1.0/8.0) * self.frame.width + (1/90.0) * self.frame.width
                 let xIncrement = (1.0/10.0) * msBoard.size.width * CGFloat(i)
                 let initialYPos = (1.0/4.0) * self.frame.height + (1/175.0) * self.frame.height
@@ -310,6 +361,7 @@ extension MinesweeperScene {
                 
                 addChild(msGrid[i][j])
                 
+                // use tile position to make htis much easier
                 msFlags[i][j] = SKSpriteNode(texture: MS_FLAG_TEXTURE)
                 msFlags[i][j].name = "flag" + "\(i)" + "\(j)"
                 msFlags[i][j].anchorPoint = .zero
@@ -327,6 +379,7 @@ extension MinesweeperScene {
     
     /// Camera setup, set original position to center of the board
     func setupCamera() {
+        // just create camera for zoom options
         addChild(msCameraNode)
         camera = msCameraNode
         msCameraNode.position = CGPoint(x: self.frame.width/2.0, y: self.frame.height/2.0)
@@ -334,6 +387,7 @@ extension MinesweeperScene {
     
     /// Help, Pause, and 15 second timer all over here
     func setupHeader() {
+        // help button, should be the same for all the scenes
         msHelpButton = SKSpriteNode(imageNamed: "GHelpButton")
         msHelpButton.name = "help button"
         msHelpButton.size = CGSize(width: (1.0 / 10.0)*self.frame.width, height: (1.0 / 10.0)*self.frame.width)
@@ -341,6 +395,7 @@ extension MinesweeperScene {
         msHelpButton.zPosition = 0.0
         camera?.addChild(msHelpButton)
         
+        // pause button, should be the same for all the scenes
         msPauseButton = SKSpriteNode(imageNamed: "GPauseButton")
         msPauseButton.name = "pause button"
         msPauseButton.size = CGSize(width: (1.0 / 10.0)*self.frame.width, height: (1.0 / 10.0)*self.frame.width)
@@ -348,6 +403,7 @@ extension MinesweeperScene {
         msPauseButton.zPosition = 0.0
         camera?.addChild(msPauseButton)
         
+        // game timer, should be the same for all the scenes
         msGameTimer = SKSpriteNode(imageNamed: "GTimer")
         msGameTimer.name = "game timer"
         msGameTimer.size = CGSize(width: (2.0 / 5.0)*self.frame.width, height: (1.0 / 10.0)*self.frame.width)
@@ -357,6 +413,7 @@ extension MinesweeperScene {
     }
     
     func setupTimer() {
+        // in game timer, bigger than the 15 second timer
         msMinigameTimer = SKSpriteNode(imageNamed: "MSHeaderTimer")
         msMinigameTimer.name = "minigame timer"
         msMinigameTimer.size = CGSize(width: (3.0 / 4.0)*self.frame.width, height: (1.0 / 6.0)*self.frame.width)
@@ -368,6 +425,7 @@ extension MinesweeperScene {
     /// Flags and Tiles left on the board
     func setupFooter() {
         // TODO: create text for description to fill in negative space
+        // the number of flags left
         msFlagsLeft = SKSpriteNode(imageNamed: "MSFooterFlagsLeft")
         msFlagsLeft.name = "flags left"
         msFlagsLeft.size = CGSize(width: (2.5 / 10.0)*self.frame.width, height: (1.3 / 10.0)*self.frame.width)
@@ -375,6 +433,7 @@ extension MinesweeperScene {
         msFlagsLeft.zPosition = 0.0
         camera?.addChild(msFlagsLeft)
         
+        // the number of total tiles left (kind of useless but wtv)
         msTilesLeft = SKSpriteNode(imageNamed: "MSFooterTilesLeft")
         msTilesLeft.name = "flags left"
         msTilesLeft.size = CGSize(width: (2.5 / 10.0)*self.frame.width, height: (1.3 / 10.0)*self.frame.width)
