@@ -21,14 +21,26 @@ class MinesweeperScene: SKScene {
     let NUM_ROWS: Int = 10
     let NUM_COLS: Int = 15
     let NUM_MINES: Int = 30
-    let DIRECTIONS: [(Int, Int)] = [(0, 1), (1, 0), (0, -1), (-1, 0)] // directions to reveal mines
+    let DIRECTIONS: [(Int, Int)] = [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, -1), (-1, 1)] // directions to reveal mines
     let MS_FLAG_TEXTURE = SKTexture(imageNamed: "MSFlagImage") // create texture to duplicate flags
+    let MS_MINE_TEXTURE = SKTexture(imageNamed: "MSMineImage") // create texture to duplicate mines
+    // textures for the numbers
+    let MS_NUMBER_ONE_TEXTURE = SKTexture(imageNamed: "MSNumber1")
+    let MS_NUMBER_TWO_TEXTURE = SKTexture(imageNamed: "MSNumber2")
+    let MS_NUMBER_THREE_TEXTURE = SKTexture(imageNamed: "MSNumber3")
+    let MS_NUMBER_FOUR_TEXTURE = SKTexture(imageNamed: "MSNumber4")
+    let MS_NUMBER_FIVE_TEXTURE = SKTexture(imageNamed: "MSNumber5")
+    let MS_NUMBER_SIX_TEXTURE = SKTexture(imageNamed: "MSNumber6")
+    let MS_NUMBER_SEVEN_TEXTURE = SKTexture(imageNamed: "MSNumber7")
+    let MS_NUMBER_EIGHT_TEXTURE = SKTexture(imageNamed: "MSNumber8")
     
     // Nodes
     var msBoard: SKSpriteNode! // background board
     var msGrid = [[MSTile]](repeating: [MSTile](repeating: MSTile(), count: 15), count: 10) // 13 rows, 15 columns
     // 2d grid of empty spritenodes, will be revealed once clicked
     var msFlags = [[SKSpriteNode]](repeating: [SKSpriteNode](repeating: SKSpriteNode(), count: 15), count: 10)
+    // list of all the mines, we don't need a grid b/c they don't really do much except vibe there
+    var msMines: [SKSpriteNode] = []
     // TODO: use SQLite3 to store board state for scene switch
     
     // Camera Nodes
@@ -92,7 +104,7 @@ class MinesweeperScene: SKScene {
 //        print("single tap, node name: \(node!.name!)")
             
         // if either tile or flag (on top of tile), then find location of node given the name
-        if(node!.name!.contains("tile") || node!.name!.contains("flag")) {
+        if((node!.name!.contains("tile") || node!.name!.contains("flag")) && !gameOver) {
             // find the row and col from the node's name
             let i = node!.name!.index(node!.name!.startIndex, offsetBy: 4)
             let j = node!.name!.index(node!.name!.startIndex, offsetBy: 5)
@@ -130,7 +142,7 @@ class MinesweeperScene: SKScene {
 //        print("long press, node name: \(node!.name!)")
         
         // if the node is the tile, no need to check flag b/c flagged tiles will not be revealed
-        if(node!.name!.contains("tile")) {
+        if(node!.name!.contains("tile") && !gameOver) {
             // find the location given the name
             let i = node!.name!.index(node!.name!.startIndex, offsetBy: 4)
             let j = node!.name!.index(node!.name!.startIndex, offsetBy: 5)
@@ -143,14 +155,16 @@ class MinesweeperScene: SKScene {
                 tileCol = Int(String(node!.name!.suffix(2)))!
             }
             
-            // checkes both revealed and flagged to make sure you don't revealed wrong tile
+            // checks both revealed and flagged to make sure you don't revealed wrong tile
             if(!msGrid[tileRow][tileCol].isRevealed && !msGrid[tileRow][tileCol].isFlagged) {
 //                debugging
 //                print("Revealed tile: (\(tileRow), \(tileCol)), position: \(msGrid[tileRow][tileCol].position)")
                 
                 // first press much create mines afterwards (so you don't accidently click on mine first)
-                if(firstPress) {
+                if firstPress {
                     firstPressed(row: tileRow, col: tileCol)
+                } else if msGrid[tileRow][tileCol].isMine {
+                    minesBlown()
                 } else {
                     revealTileAndNearby(row: tileRow, col: tileCol)
                 }
@@ -169,7 +183,7 @@ class MinesweeperScene: SKScene {
     func randomizeMines(row: Int, col: Int) {
         // all the mines
         for _ in 0..<NUM_MINES {
-            // keep changing random position until all conditiosn satisfied
+            // keep changing random position until all conditions satisfied
             var isPlaced = false
             
             while !isPlaced {
@@ -177,13 +191,19 @@ class MinesweeperScene: SKScene {
                 let ranCol = Int.random(in: 0..<NUM_COLS)
                 
                 // not starting click and not already a mine
-                if !msGrid[ranRow][ranCol].isMine && (ranRow != row && ranCol != col) {
+                if !msGrid[ranRow][ranCol].isMine && notInBound(row: row, col: col, rowCheck: ranRow, colCheck: ranCol) {
                     changeMineState(row: ranRow, col: ranCol)
                     addMine(row: ranRow, col: ranCol)
+//                    debugging
+//                    print("mine placed location (\(ranRow), \(ranCol))")
                     isPlaced = true
                 }
             }
         }
+    }
+    
+    func notInBound(row: Int, col: Int, rowCheck: Int, colCheck: Int) -> Bool {
+        return (rowCheck < row-1 || rowCheck > row+1) && (colCheck < col-1 || colCheck > col+1)
     }
     
     // Used to check all the adjacent tiles for mines
@@ -213,7 +233,16 @@ class MinesweeperScene: SKScene {
                 if !msGrid[i][j].isMine { // check statement to prevent putting numbers on mines
                     let numAdj = checkAdjTiles(row: i, col: j)
                     msGrid[i][j].adjacentMines = numAdj
-                    createNum(row: i, col: j)
+                    // try to create number, will return error if some error occurs
+                    if msGrid[i][j].adjacentMines != 0 {
+                        do {
+                            try createNum(row: i, col: j)
+                        } catch MinesweeperErrors.AdjacencyNumberOutOfBounds(let errorMessage) {
+                            print(errorMessage)
+                        } catch {
+                            // catch any other possible errors
+                        }
+                    }
                 }
             }
         }
@@ -225,7 +254,7 @@ class MinesweeperScene: SKScene {
         // only reveal if current tile has no number
         // TODO: might need to change the loop to ensure that corners get revealed as well
         if msGrid[row][col].adjacentMines == 0 {
-            for i in 0..<4 {
+            for i in 0..<8 {
                 if let curTile = msGrid[safe: row+DIRECTIONS[i].0]?[safe: col+DIRECTIONS[i].1] {
                     if !curTile.isRevealed {
                         revealTileAndNearby(row: row+DIRECTIONS[i].0, col: col+DIRECTIONS[i].1)
@@ -233,6 +262,11 @@ class MinesweeperScene: SKScene {
                 }
             }
         }
+    }
+    
+    func minesBlown() {
+        changeGameOver()
+        revealMines()
     }
     
     /* State Changes */
@@ -258,6 +292,10 @@ class MinesweeperScene: SKScene {
         msGrid[row][col].isMine = true
     }
     
+    func changeGameOver() {
+        gameOver = true
+    }
+    
 }
 
 /* Configurations */
@@ -273,12 +311,6 @@ extension MinesweeperScene {
         let addAction = SKAction.fadeAlpha(to: 1.0, duration: 0.0)
         msFlags[row][col].run(addAction)
     }
-    func addMine(row: Int, col: Int) {
-        
-    }
-    func createNum(row: Int, col: Int) {
-        
-    }
     // reveal current tile by changing opacity to 0
     func revealTile(row: Int, col: Int) {
         msGrid[row][col].isRevealed = true
@@ -286,6 +318,62 @@ extension MinesweeperScene {
 //        debugging
 //        print("reiterate coord of grid: (\(row), \(col))")
         msGrid[row][col].run(removeAction)
+    }
+    func addMine(row: Int, col: Int) {
+        let newMine = SKSpriteNode(texture: MS_MINE_TEXTURE)
+        newMine.name = "msMine"
+        newMine.size = CGSize(width: msGrid[row][col].size.width * 0.8,
+                              height: msGrid[row][col].size.height * 0.8)
+        newMine.position = CGPoint(x: msGrid[row][col].position.x + msGrid[row][col].size.width * 0.5,
+                                   y: msGrid[row][col].position.y + msGrid[row][col].size.height * 0.5)
+        newMine.zPosition = 20.0
+        newMine.alpha = 0.0
+        msMines.append(newMine)
+        addChild(newMine)
+    }
+    func revealMines() {
+        for i in 0..<msMines.count {
+            let waitAction = SKAction.wait(forDuration: 0.1 * Double(i))
+            let addAction = SKAction.fadeAlpha(to: 1.0, duration: 0.1)
+            msMines[i].run(SKAction.sequence([waitAction, addAction]))
+        }
+    }
+    func createNum(row: Int, col: Int) throws {
+        var newNumber = SKSpriteNode()
+        switch msGrid[row][col].adjacentMines {
+        case 1:
+            newNumber = SKSpriteNode(texture: MS_NUMBER_ONE_TEXTURE)
+            break
+        case 2:
+            newNumber = SKSpriteNode(texture: MS_NUMBER_TWO_TEXTURE)
+            break
+        case 3:
+            newNumber = SKSpriteNode(texture: MS_NUMBER_THREE_TEXTURE)
+            break
+        case 4:
+            newNumber = SKSpriteNode(texture: MS_NUMBER_FOUR_TEXTURE)
+            break
+        case 5:
+            newNumber = SKSpriteNode(texture: MS_NUMBER_FIVE_TEXTURE)
+            break
+        case 6:
+            newNumber = SKSpriteNode(texture: MS_NUMBER_SIX_TEXTURE)
+            break
+        case 7:
+            newNumber = SKSpriteNode(texture: MS_NUMBER_SEVEN_TEXTURE)
+            break
+        case 8:
+            newNumber = SKSpriteNode(texture: MS_NUMBER_EIGHT_TEXTURE)
+            break
+        default:
+            throw MinesweeperErrors.AdjacencyNumberOutOfBounds("trying to create number that doesn't exist location (\(row), \(col))")
+        }
+        newNumber.name = "msNumber"
+        newNumber.setScale(0.18)
+        newNumber.position = CGPoint(x: msGrid[row][col].position.x + msGrid[row][col].size.width * 0.5,
+                                     y: msGrid[row][col].position.y + msGrid[row][col].size.height * 0.5)
+        newNumber.zPosition = 5.0
+        addChild(newNumber)
     }
     
     /* Scene setup */
@@ -361,7 +449,7 @@ extension MinesweeperScene {
                 
                 addChild(msGrid[i][j])
                 
-                // use tile position to make htis much easier
+                // use tile position to make this much easier
                 msFlags[i][j] = SKSpriteNode(texture: MS_FLAG_TEXTURE)
                 msFlags[i][j].name = "flag" + "\(i)" + "\(j)"
                 msFlags[i][j].anchorPoint = .zero
@@ -374,7 +462,6 @@ extension MinesweeperScene {
                 addChild(msFlags[i][j])
             }
         }
-        
     }
     
     /// Camera setup, set original position to center of the board
@@ -442,4 +529,9 @@ extension MinesweeperScene {
         camera?.addChild(msTilesLeft)
     }
     
+}
+
+// some errors to prevent actual out of bounds/other problems
+enum MinesweeperErrors: Error {
+    case AdjacencyNumberOutOfBounds(String)
 }
