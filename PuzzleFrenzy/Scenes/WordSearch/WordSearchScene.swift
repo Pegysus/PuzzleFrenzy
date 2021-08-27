@@ -14,6 +14,7 @@ class WordSearchScene: SKScene {
     /* Properties */
     var wsCameraNode = SKCameraNode()
 
+    let wordBank = ["candy","cotton","apple","hungry","tired","sleepy","berry","dora","minority","cake","turnip"]
     
     let NUM_ROWS: Int = 8
     let NUM_COLS: Int = 8
@@ -35,7 +36,8 @@ class WordSearchScene: SKScene {
     override func didMove(to view: SKView) {
         setupNodes()
     }
-    
+
+    // checks and places words left to right
     func placeWordLR(word: String) {
         var wordIsPlaced = false
         var j : Int
@@ -45,14 +47,14 @@ class WordSearchScene: SKScene {
         var wordCannotBePlaced = true
         
         while !wordIsPlaced {
-            // checks if i and j are within the bounds of the array still if we were to place the word
+            // randomly pics a place for the row/col for the word
             j = Int.random(in: 0..<8)
             i = Int.random(in: 0..<8)
+            // checks if j are within the bounds of the array still if we were to place the word
             // if the word length can fit in that row, will make inBounds = true
             if ( 8 - j ) >= wordLen {
                 inBounds = true
             }
-            
             // check each letter to see if it works
             if inBounds {
               // runs from j
@@ -67,36 +69,144 @@ class WordSearchScene: SKScene {
                     }
                 }
             }
-            
             if wordCannotBePlaced {
                 wordIsPlaced = false
             }
             else {
                 // places word into array
-                var letterCount2 = 0
+                var lc = 0
                 for n in j ... (j + wordLen - 1) {
-                    wsLetters[i][n] = word[word.index(word.startIndex, offsetBy: letterCount2)]
-                    print (wsLetters)
-                    letterCount2 += 1
+                    wsLetters[i][n] = word[word.index(word.startIndex, offsetBy: lc)]
+                    //print (wsLetters)
+                    lc += 1
                 }
                 wordIsPlaced = true
             }
         } // while end
-    }
+    }// func ends here
+
+    // checks and places a word top to bottom
+    func placeWordTB(word: String) {
+        var wordIsPlaced = false
+        var j : Int
+        var i : Int
+        var inBounds = false
+        let wordLen = word.count
+        var wordCannotBePlaced = true
+        
+        while !wordIsPlaced {
+            // randomly pics a place for the row/col for the word
+            j = Int.random(in: 0..<8)
+            i = Int.random(in: 0..<8)
+            // checks if i within the bounds of the array still if we were to place the word
+            // if the word length can fit in that row, will make inBounds = true
+            if ( 8 - i ) >= wordLen {
+                inBounds = true
+            }
+            // check each letter to see if it works
+            if inBounds {
+              // runs from j
+                var z = 0
+                for k in i ... 7 {
+                    if wsLetters[k][j] == "." || wsLetters[k][j] == word[word.index(word.startIndex, offsetBy: z)] {
+                        wordCannotBePlaced = false
+                        z += 1
+                    }
+                    else {
+                        wordCannotBePlaced = true
+                    }
+                }
+            }
+            if wordCannotBePlaced {
+                wordIsPlaced = false
+            }
+            else {
+                // places word into array
+                var lc = 0
+                for n in i ... (i + wordLen - 1) {
+                    wsLetters[n][j] = word[word.index(word.startIndex, offsetBy: lc)]
+                    //print (wsLetters)
+                    lc += 1
+                }
+                wordIsPlaced = true
+            }
+        } // while end
+    }// func ends here
+    
+   
+    /*
+    //(!) issues with this one
+    // diagonal left to right
+    func placeWordDLR(word: String) {
+        var wordIsPlaced = false
+        var j : Int
+        var i : Int
+        var inBounds = false
+        let wordLen = word.count
+        var wordCannotBePlaced = true
+        
+        while !wordIsPlaced {
+            // randomly pics a place for the row/col for the word
+            j = Int.random(in: 0..<8)
+            i = Int.random(in: 0..<8)
+            // checks if i within the bounds of the array still if we were to place the word
+            // if the word length can fit in that row, will make inBounds = true
+            if ( 8 - i ) >= wordLen && ( 8 - j ) >= wordLen{
+                inBounds = true
+            }
+            // check each letter to see if it works
+            if inBounds {
+              // runs from j
+                var z = 0
+                var p = j
+                for k in i ... 7 {
+                    // (!) the || if letter char = board char part no work
+                    if wsLetters[k][p] == "." || wsLetters[k][p] == word[word.index(word.startIndex, offsetBy: z)] {
+                        print(word[word.index(word.startIndex, offsetBy: z)])
+                        wordCannotBePlaced = false
+                        print(wsLetters)
+                        z += 1
+                        p += 1
+                    }
+                    else {
+                        wordCannotBePlaced = true
+                    }
+                }
+            }
+            if wordCannotBePlaced {
+                wordIsPlaced = false
+            }
+            else {
+                // places word into array
+                var lc = 0
+                var yplace = j
+                for n in i ... (i + wordLen - 1) {
+                    wsLetters[n][yplace] = word[word.index(word.startIndex, offsetBy: lc)]
+                   //print (wsLetters)
+                    lc += 1
+                    yplace += 1
+                }
+                wordIsPlaced = true
+            }
+        } // while end
+    }// func ends here
+    */
     
     
+    // this func fills up the board
+    // (!) rn words r hardcoded in, need a function to randomly fill words + wordbank
     func prepareBoard()  {
-        print("candy here")
+
         placeWordLR(word: "candy")
         print (wsLetters)
-        
-        print("cotton here")
-        placeWordLR(word: "cotton")
+
+        placeWordTB(word: "turnip")
         print (wsLetters)
         
-        print("apple here")
-        placeWordLR(word: "apple")
+        placeWordDLR(word: "cake")
         print (wsLetters)
+
+        
     }
     
 } // word search scene
