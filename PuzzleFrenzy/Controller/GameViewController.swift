@@ -16,7 +16,7 @@ class GameViewController: UIViewController {
 
         let skView = view as! SKView
         
-        let scene = GameScene(size: view.bounds.size)
+        let scene = WordSearchScene(size: view.bounds.size)
         scene.scaleMode = .aspectFit
         scene.size = view.bounds.size
         
