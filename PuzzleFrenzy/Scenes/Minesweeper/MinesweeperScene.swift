@@ -54,6 +54,7 @@ class MinesweeperScene: SKScene {
     var msGameLastTimeUpdate: TimeInterval = 0
     var msGameChangeInTime: TimeInterval = 0
     var msGameTimeLeft: Double = 15 {
+        // change the time data every time the variable changes
         didSet {
             msGameTimerCountdown.text = "\(String(format: "%02ld", Int(msGameTimeLeft))):\(String(format: "%02ld", Int(100*(msGameTimeLeft-Double(Int(msGameTimeLeft))))))"
             msGameTimerCountdown.verticalAlignmentMode = .center
@@ -66,10 +67,11 @@ class MinesweeperScene: SKScene {
     var msMinigameLastTimeUpdate: TimeInterval = 0
     var msMinigameChangeInTime: TimeInterval = 0
     var msTimeLeft: Double = 480 {
+        // change the time left after variable changes
         didSet {
-            if msTimeLeft >= 60 {
+            if msTimeLeft >= 60 { // if more than a minute, format: M:SS
                 msMinigameTimeCountdown.text = "\(String(format: "%01ld", Int(msTimeLeft)/60)):\(String(format: "%02ld", Int(msTimeLeft)%60))"
-            } else {
+            } else { // if less than a minute, format: SS:MMM
                 msMinigameTimeCountdown.text = "\(String(format: "%02ld", Int(msTimeLeft)%60)):\(String(format: "%03ld", Int(1000*(msTimeLeft-Double(Int(msTimeLeft))))))"
             }
             
@@ -89,11 +91,13 @@ class MinesweeperScene: SKScene {
     var msTilesLeftNumber: SKLabelNode!
     // Footer vars
     var tilesLeft: Int = 150 {
+        // reduce tiles left every time
         didSet {
             msTilesLeftNumber!.text = String(tilesLeft)
         }
     }
     var flagsLeft: Int = 30 {
+        // reduce flags left every time it changes
         didSet {
             msFlagsLeftNumber!.text = String(flagsLeft)
         }
@@ -123,19 +127,23 @@ class MinesweeperScene: SKScene {
     }
     
     override func update(_ currentTime: TimeInterval) {
+        // if not first update
         if msMinigameLastTimeUpdate > 0 {
+            // find the change in time
             msMinigameChangeInTime = currentTime - msMinigameLastTimeUpdate
         } else {
             msMinigameChangeInTime = 0
         }
+        // update the last update time
         msMinigameLastTimeUpdate = currentTime
         if(msTimeLeft >= 0.0) {
-            msTimeLeft -= Double(msMinigameChangeInTime)
-        } else {
+            msTimeLeft -= Double(msMinigameChangeInTime) // change time left by time changing
+        } else { // time is gone, game over
             msTimeLeft = 0.0
             timesUp()
         }
         
+        // if first update
         if msGameLastTimeUpdate > 0 {
             msGameChangeInTime = currentTime - msGameLastTimeUpdate
         } else {
@@ -143,8 +151,8 @@ class MinesweeperScene: SKScene {
         }
         msGameLastTimeUpdate = currentTime
         if(msGameTimeLeft >= 0.0) {
-            msGameTimeLeft -= Double(msGameChangeInTime)
-        } else {
+            msGameTimeLeft -= Double(msGameChangeInTime) // reduce time by the amount of time changed
+        } else { // time is gone, switch the scene
             msGameTimeLeft = 0.0
             nextMinigame()
         }
@@ -262,6 +270,7 @@ class MinesweeperScene: SKScene {
     }
     
     func notInBound(row: Int, col: Int, rowCheck: Int, colCheck: Int) -> Bool {
+        // check if the row or the column is in bounds of the grid
         return (rowCheck < row-1 || rowCheck > row+1) && (colCheck < col-1 || colCheck > col+1)
     }
     
@@ -323,15 +332,18 @@ class MinesweeperScene: SKScene {
         }
     }
     
+    // reveal all mines
     func minesBlown() {
         changeGameOver()
         revealMines()
     }
     
+    // game time ran out
     func timesUp() {
         changeGameOver()
     }
     
+    // 15 second timer is up and scene is changed
     func nextMinigame() {
         changeScene()
     }
@@ -388,27 +400,34 @@ extension MinesweeperScene {
         msGrid[row][col].run(removeAction)
     }
     
+    // adding a mine at a certain location
     func addMine(row: Int, col: Int) {
+        // use texture to duplicate them
         let newMine = SKSpriteNode(texture: MS_MINE_TEXTURE)
         newMine.name = "msMine"
+        // slightly smaller and centered at the tile
         newMine.size = CGSize(width: msGrid[row][col].size.width * 0.8,
                               height: msGrid[row][col].size.height * 0.8)
         newMine.position = CGPoint(x: msGrid[row][col].position.x + msGrid[row][col].size.width * 0.5,
                                    y: msGrid[row][col].position.y + msGrid[row][col].size.height * 0.5)
         newMine.zPosition = 20.0
+        // invisible at first
         newMine.alpha = 0.0
         msMines.append(newMine)
         addChild(newMine)
     }
     func revealMines() {
+        // go through all the mines and reveal them (should be in random order)
         for i in 0..<msMines.count {
             let waitAction = SKAction.wait(forDuration: 0.1 * Double(i))
             let addAction = SKAction.fadeAlpha(to: 1.0, duration: 0.1)
             msMines[i].run(SKAction.sequence([waitAction, addAction]))
         }
     }
+    // create the numbers for the adjacency thing
     func createNum(row: Int, col: Int) throws {
         var newNumber = SKSpriteNode()
+        // switch case for the adjancentMines variable (to choose the right texture)
         switch msGrid[row][col].adjacentMines {
         case 1:
             newNumber = SKSpriteNode(texture: MS_NUMBER_ONE_TEXTURE)
@@ -435,9 +454,11 @@ extension MinesweeperScene {
             newNumber = SKSpriteNode(texture: MS_NUMBER_EIGHT_TEXTURE)
             break
         default:
+            // if not 1-8, something wrong happened
             throw MinesweeperErrors.AdjacencyNumberOutOfBounds("trying to create number that doesn't exist location (\(row), \(col))")
         }
         newNumber.name = "msNumber"
+        // might need to change so it works for all phone sizes
         newNumber.setScale(0.18)
         newNumber.position = CGPoint(x: msGrid[row][col].position.x + msGrid[row][col].size.width * 0.5,
                                      y: msGrid[row][col].position.y + msGrid[row][col].size.height * 0.5)
