@@ -13,8 +13,7 @@ class WordSearchScene: SKScene {
     
     /* Properties */
     var wsCameraNode = SKCameraNode()
-
-    let wordBank = ["candy","cotton","apple","hungry","tired","sleepy","berry","dora","minority","cake","turnip"]
+    let wordBank = ["candy","cotton","apple","hungry","tired","sleepy","berry","dora","minority","cake","turnip","cake"]
     
     let NUM_ROWS: Int = 8
     let NUM_COLS: Int = 8
@@ -44,21 +43,20 @@ class WordSearchScene: SKScene {
         var wordCanBePlaced = false
         var wordIsPlaced = false
         let wordLen = word.count
-        var x = 0
+        var currentDirection = 0
         
         // runs while the word is still being placed
         while !wordIsPlaced {
             var char = 0
             // if at end of direction array, new i & j
-            if x >= directions.count {
+            if currentDirection >= directions.count {
                 i = Int.random(in: 0..<8)
                 j = Int.random(in: 0..<8)
-                x = 0
+                currentDirection = 0
             }
-            if ( i + directions[x].0 >= 8 || j + directions[x].1 >= 8 ) || ( i + directions[x].0 < 0 || j + directions[x].1 < 0 ){
-                x += 1
+            if ( i + directions[currentDirection].0 >= 8 || j + directions[currentDirection].1 >= 8 ) || ( i + directions[currentDirection].0 < 0 || j + directions[currentDirection].1 < 0 ){
+                currentDirection += 1
             }
-
             var z = 0
             var inew = i
             var jnew = j
@@ -66,31 +64,28 @@ class WordSearchScene: SKScene {
             for _ in 0..<wordLen {
                 if (jnew >= 8 || inew >= 8 ) || (jnew < 0 || inew < 0) {
                     wordCanBePlaced = false
-                    x += 1
+                    currentDirection += 1
                     break
                 }
                 else if z == wordLen {
                     wordCanBePlaced = true
                     break
                 }
-                else if x >= directions.count {
+                else if currentDirection >= directions.count {
                     i = Int.random(in: 0..<8)
                     j = Int.random(in: 0..<8)
-                    x = 0
+                    currentDirection = 0
                     break
                 }
-                
-                // need to check inew and jnew if it fits in the approporiate range
-                // sometime may be amiss here
                 else if z < wordLen && (wsLetters[inew][jnew] == "." || wsLetters[inew][jnew] == word[word.index(word.startIndex, offsetBy: z)]) {
-                    inew += directions[x].0
-                    jnew += directions[x].1
+                    inew += directions[currentDirection].0
+                    jnew += directions[currentDirection].1
                     wordCanBePlaced = true
                     z += 1
                 }
                 else {
                     wordCanBePlaced = false
-                    x += 1
+                    currentDirection += 1
                     break
                 }
             }
@@ -104,32 +99,38 @@ class WordSearchScene: SKScene {
                         wsLetters[inew][jnew] = word[word.index(word.startIndex, offsetBy: char)]
                         char += 1
                         print (wsLetters)
-                        inew += directions[x].0
-                        jnew += directions[x].1
+                        inew += directions[currentDirection].0
+                        jnew += directions[currentDirection].1
                         }
                     wordIsPlaced = true
                 }
             }
         }
     }
-
+    // finds random words and fills the 2d array with 6 of them
+    func findWordsAndFill() {
+        var randIndex : Int
+        var previousIndex: [Int] = [-1]
+        for _ in 0...6 {
+            // makes sure no words are repeated
+            randIndex = Int.random(in: 0..<directions.count)
+            // adds words to 2d array
+            if !previousIndex.contains(randIndex) {
+                placeWord( word: wordBank[randIndex] )
+                // makes sure no words are repeated
+                previousIndex.append(randIndex)
+            }
+        }
+    }
+    
     // this func fills up the board
     // (!) rn words r hardcoded in, need a function to randomly fill words + wordbank
     func prepareBoard()  {
-        //placeWordLR(word: "candy")
-        placeWord(word: "candy")
-        placeWord(word: "cards")
-        placeWord(word: "cake")
-        placeWord(word: "plane")
-        placeWord(word: "cookie")
-        placeWord(word: "amazed")
+        findWordsAndFill()
         print(wsLetters)
     }
     
 } // word search scene
-
-
-
 
 
 /* Configuration */
