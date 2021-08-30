@@ -49,30 +49,61 @@ class MinesweeperScene: SKScene {
     // Header Nodes
     var msHelpButton: SKSpriteNode!
     var msPauseButton: SKSpriteNode!
-    // Timer variables
-    var ms15SecondTimerStart: TimeInterval!
-    var ms15TimeLeft: Double!
-    var msGameTimer: SKSpriteNode!
     
-    var msStartTime: TimeInterval!
-    var msTimeLeft: Double!
+    // Timer variables
+    var msGameLastTimeUpdate: TimeInterval = 0
+    var msGameChangeInTime: TimeInterval = 0
+    var msGameTimeLeft: Double = 15 {
+        didSet {
+            msGameTimerCountdown.text = "\(String(format: "%02ld", Int(msGameTimeLeft))):\(String(format: "%02ld", Int(100*(msGameTimeLeft-Double(Int(msGameTimeLeft))))))"
+            msGameTimerCountdown.verticalAlignmentMode = .center
+            msGameTimerCountdown.horizontalAlignmentMode = .center
+        }
+    }
+    var msGameTimer: SKSpriteNode!
+    var msGameTimerCountdown: SKLabelNode!
+    
+    var msMinigameLastTimeUpdate: TimeInterval = 0
+    var msMinigameChangeInTime: TimeInterval = 0
+    var msTimeLeft: Double = 480 {
+        didSet {
+            if msTimeLeft >= 60 {
+                msMinigameTimeCountdown.text = "\(String(format: "%01ld", Int(msTimeLeft)/60)):\(String(format: "%02ld", Int(msTimeLeft)%60))"
+            } else {
+                msMinigameTimeCountdown.text = "\(String(format: "%02ld", Int(msTimeLeft)%60)):\(String(format: "%03ld", Int(1000*(msTimeLeft-Double(Int(msTimeLeft))))))"
+            }
+            
+            msMinigameTimeCountdown.verticalAlignmentMode = .center
+            msMinigameTimeCountdown.horizontalAlignmentMode = .center
+        }
+    }
     var msMinigameTimer: SKSpriteNode!
+    var msMinigameTimeCountdown: SKLabelNode!
     // TODO: use SQLite3 to store current time left as the scene switches
     
     // Footer Nodes
     var msInstructions: SKLabelNode!
     var msFlagsLeft: SKSpriteNode!
     var msTilesLeft: SKSpriteNode!
-    
-    // Temp Nodes
-    var touched: SKNode!
+    var msFlagsLeftNumber: SKLabelNode!
+    var msTilesLeftNumber: SKLabelNode!
+    // Footer vars
+    var tilesLeft: Int = 150 {
+        didSet {
+            msTilesLeftNumber!.text = String(tilesLeft)
+        }
+    }
+    var flagsLeft: Int = 30 {
+        didSet {
+            msFlagsLeftNumber!.text = String(flagsLeft)
+        }
+    }
     
     // States
     var firstPress = true // check if the user pressed the first time to reveal a tile and start the game
     var isInPause = false // make sure to pause everything when the game is paused
     var isInHelp = false // similar to pause, might delete if redundant
     var gameOver = false // when timer runs out/mine is pressed
-    
     
     /* Methods */
     
@@ -89,6 +120,34 @@ class MinesweeperScene: SKScene {
         // long press gesture, reveal the tile and any nearby ones (if no mine nearby)
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPress(_:)))
         view.addGestureRecognizer(longPressGesture)
+    }
+    
+    override func update(_ currentTime: TimeInterval) {
+        if msMinigameLastTimeUpdate > 0 {
+            msMinigameChangeInTime = currentTime - msMinigameLastTimeUpdate
+        } else {
+            msMinigameChangeInTime = 0
+        }
+        msMinigameLastTimeUpdate = currentTime
+        if(msTimeLeft >= 0.0) {
+            msTimeLeft -= Double(msMinigameChangeInTime)
+        } else {
+            msTimeLeft = 0.0
+            timesUp()
+        }
+        
+        if msGameLastTimeUpdate > 0 {
+            msGameChangeInTime = currentTime - msGameLastTimeUpdate
+        } else {
+            msGameChangeInTime = 0
+        }
+        msGameLastTimeUpdate = currentTime
+        if(msGameTimeLeft >= 0.0) {
+            msGameTimeLeft -= Double(msGameChangeInTime)
+        } else {
+            msGameTimeLeft = 0.0
+            nextMinigame()
+        }
     }
     
     // flag and unflag the tile
@@ -269,6 +328,14 @@ class MinesweeperScene: SKScene {
         revealMines()
     }
     
+    func timesUp() {
+        changeGameOver()
+    }
+    
+    func nextMinigame() {
+        changeScene()
+    }
+    
     /* State Changes */
     
     // changes the state of the flag on a certain tile
@@ -283,17 +350,15 @@ class MinesweeperScene: SKScene {
     }
     
     // should only be caleld once
-    func changedfirstPressedState() {
-        firstPress = false
-    }
+    func changedfirstPressedState() { firstPress = false }
     
     // just to change mine state
-    func changeMineState(row: Int, col: Int) {
-        msGrid[row][col].isMine = true
-    }
+    func changeMineState(row: Int, col: Int) { msGrid[row][col].isMine = true }
     
-    func changeGameOver() {
-        gameOver = true
+    func changeGameOver() { gameOver = true }
+    
+    func changeScene() {
+        
     }
     
 }
@@ -304,21 +369,25 @@ extension MinesweeperScene {
     
     /* Scene changes */
     func removeFlag(row: Int, col: Int) {
+        flagsLeft += 1
         let removeAction = SKAction.fadeAlpha(to: 0.0, duration: 0.0)
         msFlags[row][col].run(removeAction)
     }
     func addFlag(row: Int, col: Int) {
+        flagsLeft -= 1
         let addAction = SKAction.fadeAlpha(to: 1.0, duration: 0.0)
         msFlags[row][col].run(addAction)
     }
     // reveal current tile by changing opacity to 0
     func revealTile(row: Int, col: Int) {
+        tilesLeft -= 1
         msGrid[row][col].isRevealed = true
         let removeAction = SKAction.fadeAlpha(to: 0.0, duration: 0.0)
 //        debugging
 //        print("reiterate coord of grid: (\(row), \(col))")
         msGrid[row][col].run(removeAction)
     }
+    
     func addMine(row: Int, col: Int) {
         let newMine = SKSpriteNode(texture: MS_MINE_TEXTURE)
         newMine.name = "msMine"
@@ -397,7 +466,7 @@ extension MinesweeperScene {
         background.anchorPoint = .zero
         background.position = .zero
         background.zPosition = -20.0
-        background.color = UIColor.white
+        background.color = .white
         addChild(background)
         
         // use a headerBackground for the camera so that it won't be affected by the zoom
@@ -406,7 +475,7 @@ extension MinesweeperScene {
         headerBackground.size = CGSize(width: self.frame.width, height: (1.0 / 4.0)*self.frame.height)
         headerBackground.position = CGPoint(x: 0.0, y: -(3.0/8.0)*self.frame.height)
         headerBackground.zPosition = -15.0
-        headerBackground.color = UIColor.white
+        headerBackground.color = .white
         camera?.addChild(headerBackground)
         
         // use a footerBackground for the camera so that it won't be affected by the zoom
@@ -415,7 +484,7 @@ extension MinesweeperScene {
         footerBackground.size = CGSize(width: self.frame.width, height: (1.0 / 4.0)*self.frame.height)
         footerBackground.position = CGPoint(x: 0.0, y: (3.0/8.0)*self.frame.height)
         footerBackground.zPosition = -15.0
-        footerBackground.color = UIColor.white
+        footerBackground.color = .white
         camera?.addChild(footerBackground)
     }
     
@@ -497,6 +566,21 @@ extension MinesweeperScene {
         msGameTimer.position = CGPoint(x: 0.0, y: (5.0 / 12.0)*self.frame.height)
         msGameTimer.zPosition = 0.0
         camera?.addChild(msGameTimer)
+        
+        msGameTimerCountdown = SKLabelNode(text: "\(String(format: "%02ld", Int(msGameTimeLeft))):\(String(format: "%02ld", Int(100*(msGameTimeLeft-Double(Int(msGameTimeLeft))))))")
+        msGameTimerCountdown.fontName = "RobotoMono-SemiBold"
+        
+        msGameTimerCountdown.fontSize = 24
+        let scalingFactor = min(msGameTimer.size.width/msGameTimerCountdown.frame.width*0.6,
+                                msGameTimer.size.height/msGameTimerCountdown.frame.height*0.6)
+        msGameTimerCountdown.fontSize *= scalingFactor
+        
+        msGameTimerCountdown.fontColor = .black
+        msGameTimerCountdown.verticalAlignmentMode = .center
+        msGameTimerCountdown.horizontalAlignmentMode = .center
+        msGameTimerCountdown.numberOfLines = 1
+        msGameTimerCountdown.zPosition = 10.0
+        msGameTimer?.addChild(msGameTimerCountdown)
     }
     
     func setupTimer() {
@@ -507,6 +591,21 @@ extension MinesweeperScene {
         msMinigameTimer.position = CGPoint(x: 0.0, y: (3.66 / 12.0)*self.frame.height)
         msMinigameTimer.zPosition = 0.0
         camera?.addChild(msMinigameTimer)
+        
+        msMinigameTimeCountdown = SKLabelNode(text: "\(String(format: "%01ld", Int(msTimeLeft)/60)):\(String(format: "%02ld", Int(msTimeLeft)%60)):\(String(format: "%03ld", Int(1000*(msTimeLeft-Double(Int(msTimeLeft))))))")
+        msMinigameTimeCountdown.fontName = "RobotoMono-SemiBold"
+        
+        msMinigameTimeCountdown.fontSize = 24
+        let scalingFactor = min(msMinigameTimer.size.width/msMinigameTimeCountdown.frame.width*0.75,
+                                msMinigameTimer.size.height/msMinigameTimeCountdown.frame.height*0.75)
+        msMinigameTimeCountdown.fontSize *= scalingFactor
+        
+        msMinigameTimeCountdown.fontColor = .black
+        msMinigameTimeCountdown.verticalAlignmentMode = .center
+        msMinigameTimeCountdown.horizontalAlignmentMode = .center
+        msMinigameTimeCountdown.numberOfLines = 1
+        msMinigameTimeCountdown.zPosition = 10.0
+        msMinigameTimer?.addChild(msMinigameTimeCountdown)
     }
     
     /// Flags and Tiles left on the board
@@ -520,6 +619,16 @@ extension MinesweeperScene {
         msFlagsLeft.zPosition = 0.0
         camera?.addChild(msFlagsLeft)
         
+        msFlagsLeftNumber = SKLabelNode(text: "\(flagsLeft)")
+        msFlagsLeftNumber.fontName = "Inter-Regular"
+        msFlagsLeftNumber.fontSize = 24
+        msFlagsLeftNumber.fontColor = .black
+        msFlagsLeftNumber.verticalAlignmentMode = .center
+        msFlagsLeftNumber.horizontalAlignmentMode = .left
+        msFlagsLeftNumber.numberOfLines = 1
+        msFlagsLeftNumber.zPosition = 10.0
+        msFlagsLeft?.addChild(msFlagsLeftNumber)
+        
         // the number of total tiles left (kind of useless but wtv)
         msTilesLeft = SKSpriteNode(imageNamed: "MSFooterTilesLeft")
         msTilesLeft.name = "flags left"
@@ -527,6 +636,16 @@ extension MinesweeperScene {
         msTilesLeft.position = CGPoint(x: (1.0 / 5.0)*self.frame.width, y: -(3.66 / 12.0)*self.frame.height)
         msTilesLeft.zPosition = 0.0
         camera?.addChild(msTilesLeft)
+        
+        msTilesLeftNumber = SKLabelNode(text: "\(tilesLeft)")
+        msTilesLeftNumber.fontName = "Inter-Regular"
+        msTilesLeftNumber.fontSize = 24
+        msTilesLeftNumber.fontColor = .black
+        msTilesLeftNumber.verticalAlignmentMode = .center
+        msTilesLeftNumber.horizontalAlignmentMode = .left
+        msTilesLeftNumber.numberOfLines = 1
+        msTilesLeftNumber.zPosition = 10.0
+        msTilesLeft?.addChild(msTilesLeftNumber)
     }
     
 }
