@@ -26,6 +26,7 @@
 		12E892FA26C1CC4000C07E83 /* WordSearchScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892F926C1CC4000C07E83 /* WordSearchScene.swift */; };
 		12E892FC26C1CC5F00C07E83 /* MinesweeperScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E892FB26C1CC5F00C07E83 /* MinesweeperScene.swift */; };
 		12E8930126C399E200C07E83 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 12E8930026C399E100C07E83 /* GoogleService-Info.plist */; };
+		CA8DF18226D9A3F200D6FC32 /* CollectionExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8DF18126D9A3F200D6FC32 /* CollectionExt.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,6 +69,7 @@
 		12E892F926C1CC4000C07E83 /* WordSearchScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSearchScene.swift; sourceTree = "<group>"; };
 		12E892FB26C1CC5F00C07E83 /* MinesweeperScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinesweeperScene.swift; sourceTree = "<group>"; };
 		12E8930026C399E100C07E83 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		CA8DF18126D9A3F200D6FC32 /* CollectionExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CollectionExt.swift; path = PuzzleFrenzy/Scenes/CollectionExt.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -177,6 +179,7 @@
 		12E892F226C1B8E000C07E83 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				CA8DF18126D9A3F200D6FC32 /* CollectionExt.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -349,6 +352,7 @@
 			files = (
 				12E892F826C1CC0500C07E83 /* SelectMenu.swift in Sources */,
 				123CD33226BB152700C1064D /* GameScene.swift in Sources */,
+				CA8DF18226D9A3F200D6FC32 /* CollectionExt.swift in Sources */,
 				123169B626C4852000BC5FC3 /* MSTile.swift in Sources */,
 				123CD33426BB152700C1064D /* GameViewController.swift in Sources */,
 				123CD32C26BB152700C1064D /* AppDelegate.swift in Sources */,
